@@ -4,12 +4,18 @@ import numpy as np
 from contours import Contours;
 
 def processImage(image):
-    # image = cv2.resize(image, (200, 1000))  # Redimensionar la imagen si es necesario
+    # image = cv2.resize(image, (200, 1000))
     image = cv2.bilateralFilter(image, 30, 75, 75)
     image = cv2.medianBlur(image, 9)
-    image = cv2.medianBlur(image, 9)# Desenfoque mediano (ideal para eliminar ruido sal y pimienta)
-    #image = cv2.blur(image, (5, 5))  # Filtro de caja (promedio de los píxeles en un área)
+    image = cv2.medianBlur(image, 9)
+    #image = cv2.blur(image, (5, 5))
     return image
+
+def drawLines(image, height, width):
+    color = (0, 0, 0)  
+    tick = 2  
+    cv2.line(image, (0, 0), (0, height), color, tick)
+    cv2.line(image, (width - 1, 0), (width - 1, height), color, tick)
 
 def recoverEdges(image):
     edged = cv2.Canny(image, 30, 200);
@@ -44,28 +50,24 @@ def tests(max):
 
 
 image = cv2.imread("don.jpg");
-#image = cv2.resize(image, (2000,1000))
-image = cv2.resize(image, (500,1000))
+height, width = image.shape[:2]
+if(height>width):
+    image = cv2.resize(image, (500,1000))
+else:
+    image = cv2.resize(image, (2000,1000))
 
 height, width = image.shape[:2]
+drawLines(image,height,width)
 
-# Definir los puntos de las líneas verticales
-color = (0, 0, 0)  
-tick = 2  # Grosor de la línea
-
-cv2.line(image, (0, 0), (0, height), color, tick)
-
-cv2.line(image, (width - 1, 0), (width - 1, height), color, tick)
-
-gray = processImage(image);
-edged = recoverEdges(gray);
+process = processImage(image);
+edged = recoverEdges(process);
 list = contourList(edged);
 print(len(list))
 
 max = maxContour(list);
 approx = tests(max);
-print(len(approx))
-print(max.getHierarchy())
+#print(len(approx))
+#print(max.getHierarchy())
 #max.setPosition(list);
 """ max.setSons(list);
 sons = max.getSons(); """
