@@ -11,7 +11,7 @@ def processImage(image):
     #image = cv2.blur(image, (5, 5))  # Filtro de caja (promedio de los píxeles en un área)
     return image
 
-#hola nueva rama
+#hola nueva rama jiji
 
 def recoverEdges(image):
     edged = cv2.Canny(image, 30, 200);
