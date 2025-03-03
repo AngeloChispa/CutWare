@@ -48,7 +48,7 @@ def tests(max):
     approx = cv2.approxPolyDP(max.getContour(), epsilon, True);
     return approx;
 
-
+'''
 image = cv2.imread("don.jpg");
 height, width = image.shape[:2]
 if(height>width):
@@ -84,3 +84,4 @@ cv2.imshow("Contornos", edged);
 
 cv2.waitKey(0);
 cv2.destroyAllWindows();
+'''

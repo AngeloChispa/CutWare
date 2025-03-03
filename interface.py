@@ -1,11 +1,8 @@
-import cv2
 import sys
-import numpy as np
 from PyQt6 import QtWidgets, QtGui
-from PyQt6.QtCore import pyqtSignal, QSize
+from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import QHBoxLayout, QMessageBox
 from main import *
-
 
 class MiEtiqueta(QtWidgets.QLabel):
     def __init__(self):
@@ -16,9 +13,6 @@ class MiEtiqueta(QtWidgets.QLabel):
 class Window(QtWidgets.QWidget):
 
     def center(self):
-        """
-        Centra la Ventada SI o SI
-        """
         qr = self.frameGeometry()
         cp = self.screen().availableGeometry().center()
 
@@ -36,8 +30,8 @@ class Window(QtWidgets.QWidget):
 
         self.viewer = MiEtiqueta()
         self.viewer2 = MiEtiqueta()
-        self.viewer.setFixedSize(640, 480)
-        self.viewer2.setFixedSize(640, 480)
+        self.viewer.setFixedSize(440, 480)
+        self.viewer2.setFixedSize(440, 480)
         self.viewer.setScaledContents(True)
         self.viewer2.setScaledContents(True)
 
@@ -57,9 +51,9 @@ class Window(QtWidgets.QWidget):
         self.guardarImagen.clicked.connect(self.handleSaveFile)
 
         layout = QtWidgets.QGridLayout(self)
-        self.botonProcesaReservado = QtWidgets.QPushButton("Buscar Señales de Trafico")
+        self.botonProcesaReservado = QtWidgets.QPushButton("Procesar imagen")
         self.botonProcesaReservado.setMinimumSize(BUTTON_SIZE)
-        self.botonProcesaReservado.clicked.connect()
+        self.botonProcesaReservado.clicked.connect(self.detectImage)
 
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.buttonOpen)
@@ -100,19 +94,37 @@ class Window(QtWidgets.QWidget):
             self._path = path
             self.ActualizarImagen()
         else:
-            print("non") #añadir una advertencia que el path no vale verga
+            print("El path no es valido, vuelva a intentar con otro") #añadir una advertencia que el path no vale verga
 
-
-
-    def detectSigns(self):
+    def detectImage(self):
         if self.OpenCV_image is None:
             QMessageBox.warning(self, "Error", "Aún no has cargado una imagen")
             return
 
         self.OpenCV_image2 = self.OpenCV_image.copy()
-        hsv = cv2.cvtColor(self.OpenCV_image2, cv2.COLOR_BGR2HSV)
+        image = self.OpenCV_image.copy()
 
+        height, width = image.shape[:2]
+        if height > width:
+            image = cv2.resize(image, (500, 1000))
+        else:
+            image = cv2.resize(image, (2000, 1000))
 
+        height, width = image.shape[:2]
+        drawLines(image, height, width)
+
+        processed_image = processImage(image)
+        edged = recoverEdges(processed_image)
+        list = contourList(edged)
+        print(len(list))
+
+        max = maxContour(list)
+        #approx = tests(max)
+
+        cv2.imshow("Contornos", edged);
+
+        image = cv2.drawContours(image, [max.getContour()], -1, (0, 0, 255), 2)
+        self.OpenCV_image2 = image
         self.ActualizarPixMap2(self.OpenCV_image2)
 
     def ActualizarPixMap(self):
@@ -132,6 +144,7 @@ class Window(QtWidgets.QWidget):
         display_width = self.viewer2.width()
         display_height = self.viewer2.height()
         resized_image = cv2.resize(image, (display_width, display_height), interpolation=cv2.INTER_LINEAR)
+
         qimage = QtGui.QImage(
             cv2.cvtColor(resized_image, cv2.COLOR_BGR2RGB),
             resized_image.shape[1],
@@ -139,13 +152,16 @@ class Window(QtWidgets.QWidget):
             resized_image.shape[1] * 3,
             QtGui.QImage.Format.Format_RGB888
         )
+
         self.viewer2.setPixmap(QtGui.QPixmap(qimage))
 
     def ActualizarImagen(self):
         self.OpenCV_image = cv2.imread(self._path)
         self.OpenCV_image3 = self.OpenCV_image.copy()
-        displaysize = (self.viewer.width(), self.viewer.height())
-        self.OpenCV_image3 = cv2.resize(self.OpenCV_image3, displaysize, interpolation=cv2.INTER_LINEAR)
+
+        display_size = (self.viewer.width(), self.viewer.height())
+        self.OpenCV_image3 = cv2.resize(self.OpenCV_image3, display_size, interpolation=cv2.INTER_LINEAR)
+
         QImageTemp = QtGui.QImage(
             cv2.cvtColor(self.OpenCV_image3, cv2.COLOR_BGR2RGB),
             self.OpenCV_image3.shape[1],
@@ -153,15 +169,14 @@ class Window(QtWidgets.QWidget):
             self.OpenCV_image3.shape[1] * 3,
             QtGui.QImage.Format.Format_RGB888
         )
+
         pixmap = QtGui.QPixmap(QImageTemp)
-        self.viewer.setPixmap(pixmap)
-        self.viewer2.setPixmap(pixmap)
+        self.viewer.setPixmap(pixmap)  # Solo actualizar la original
 
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     window = Window()
-    window.setWindowTitle("Traffic Sign Detector")
+    window.setWindowTitle("Biggest Image Detector")
     window.show()
     sys.exit(app.exec())
-
