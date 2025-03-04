@@ -54,7 +54,8 @@ def maxContour(list):
 
 def drawSquare(contour, image):
     x, y, w, h = cv2.boundingRect(contour)
-    cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    #cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    return image[y:y+h, x:x+w]
 
 def tests(max):
     epsilon = 0.02 * cv2.arcLength(max.getContour(), True);

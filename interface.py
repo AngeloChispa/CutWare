@@ -163,13 +163,14 @@ class Window(QtWidgets.QWidget):
         max = maxContour(list)
         #approx = tests(max)
 
-        cv2.imshow("Contornos", edged);
+        #cv2.imshow("Contornos", edged);
 
-        image = cv2.drawContours(image, [max.getContour()], -1, (0, 0, 255), 2)
-        self.OpenCV_image2 = image
+        #image = cv2.drawContours(image, [max.getContour()], -1, (0, 0, 255), 2)
+        
+        self.OpenCV_image2 = drawSquare(max.getContour(),image)
 
         self.ActualizarPixMap2(self.OpenCV_image2)
-        crop = self.show_alert_with_image(self.OpenCV_image.copy())
+        crop = self.show_alert_with_image(self.OpenCV_image2.copy())
 
         if crop:
             print("Si le gustó siiiiiiiiiii")
