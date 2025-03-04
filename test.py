@@ -1,13 +1,16 @@
 import sys
 import cv2
-import numpy as np
 from PyQt6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
 from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtCore import Qt, QPoint
 
+from engine import resizeImage
+
+
 class ImageEditor(QWidget):
-    def __init__(self):
+    def __init__(self, path):
         super().__init__()
+        self.path = path
         self.initUI()
     
     def initUI(self):
@@ -30,6 +33,8 @@ class ImageEditor(QWidget):
         self.setLayout(layout)
     
     def openImage(self):
+        self.image = cv2.imread(self.path)
+        self.image = cv2.resize(self.image, (550, 650))
         self.image = cv2.imread("ak.png")
         height, width = self.image.shape[:2]
         if height > width:
@@ -43,6 +48,7 @@ class ImageEditor(QWidget):
         self.displayImage()
     
     
+
     
     def displayImage(self):
         if self.image is not None:
