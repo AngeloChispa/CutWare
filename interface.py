@@ -30,8 +30,8 @@ class Window(QtWidgets.QWidget):
 
         self.viewer = MiEtiqueta()
         self.viewer2 = MiEtiqueta()
-        self.viewer.setFixedSize(440, 480)
-        self.viewer2.setFixedSize(440, 480)
+        self.viewer.setFixedSize(340, 580)
+        self.viewer2.setFixedSize(340, 580)
         self.viewer.setScaledContents(True)
         self.viewer2.setScaledContents(True)
 
@@ -92,6 +92,17 @@ class Window(QtWidgets.QWidget):
         #self.FilePath = path + ".txt"
         if path:
             self._path = path
+            self.OpenCV_image = cv2.imread(path)
+            if self.OpenCV_image is not None:
+                height, width = self.OpenCV_image.shape[:2]
+
+                if height > width:  # Vertical
+                    label_width, label_height = 340, 580
+                else:  # Horizontal
+                    label_width, label_height = 580, 340
+
+                self.viewer.setFixedSize(label_width, label_height)
+                self.viewer2.setFixedSize(label_width, label_height)
             self.ActualizarImagen()
         else:
             print("El path no es valido, vuelva a intentar con otro") #añadir una advertencia que el path no vale verga
@@ -125,6 +136,7 @@ class Window(QtWidgets.QWidget):
 
         image = cv2.drawContours(image, [max.getContour()], -1, (0, 0, 255), 2)
         self.OpenCV_image2 = image
+
         self.ActualizarPixMap2(self.OpenCV_image2)
 
     def ActualizarPixMap(self):
