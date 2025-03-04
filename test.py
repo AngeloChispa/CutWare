@@ -75,6 +75,6 @@ class ImageEditor(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = ImageEditor()
+    window = ImageEditor("girl.jpg")
     window.show()
     sys.exit(app.exec())

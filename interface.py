@@ -177,7 +177,6 @@ class Window(QtWidgets.QWidget):
             print("Pues que lo recorte el por quisquilloso")
             self.nuevaVentana(self._path)
 
-
     def nuevaVentana(self, path):
         self.ventana = ImageEditor(path)
         self.ventana.show()
