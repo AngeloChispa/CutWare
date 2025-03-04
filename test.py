@@ -12,7 +12,7 @@ class ImageEditor(QWidget):
     
     def initUI(self):
         self.setWindowTitle("Dibujar Cuadrado")
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(100, 100, 1000, 800)
 
         self.label = QLabel(self)
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -30,19 +30,19 @@ class ImageEditor(QWidget):
         self.setLayout(layout)
     
     def openImage(self):
-        self.image = cv2.imread("meme.jpg")
+        self.image = cv2.imread("ak.png")
+        height, width = self.image.shape[:2]
+        if height > width:
+            self.image = cv2.resize(self.image,(400,800))
+            self.offset = QPoint(291, 1)
+        else:
+            self.image = cv2.resize(self.image,(800,600)) 
+            self.offset = QPoint(88, 88)   
         self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
         self.original_image = self.image.copy()
-        self.resizeWindowToImage()
         self.displayImage()
     
-    def resizeWindowToImage(self):
-        if self.image is not None:
-            height, width, _ = self.image.shape
-            max_width, max_height = 1080, 1200
-            new_width = min(width + 20, max_width)
-            new_height = min(height + 80, max_height)
-            self.resize(new_width, new_height)
+    
     
     def displayImage(self):
         if self.image is not None:
@@ -56,13 +56,13 @@ class ImageEditor(QWidget):
         if self.image is not None and event.button() == Qt.MouseButton.LeftButton:
             self.drawing = True
             self.image = self.original_image.copy()
-            self.start_point = self.label.mapFromGlobal(event.globalPosition().toPoint())
+            self.start_point = self.label.mapFromGlobal(event.globalPosition().toPoint()) - self.offset
             self.end_point = self.start_point
             self.displayImage()
     
     def mouseMoveEvent(self, event):
         if self.drawing and self.image is not None:
-            self.end_point = self.label.mapFromGlobal(event.globalPosition().toPoint())
+            self.end_point = self.label.mapFromGlobal(event.globalPosition().toPoint()) - self.offset
             self.image = self.original_image.copy()
             cv2.rectangle(self.image, (self.start_point.x(), self.start_point.y()), 
                           (self.end_point.x(), self.end_point.y()), (255, 0, 0), 2)
@@ -71,11 +71,11 @@ class ImageEditor(QWidget):
     def mouseReleaseEvent(self, event):
         if self.drawing and self.image is not None:
             self.drawing = False
-            self.end_point = self.label.mapFromGlobal(event.globalPosition().toPoint())
+            self.end_point = self.label.mapFromGlobal(event.globalPosition().toPoint()) - self.offset
+            print(self.end_point)
             self.image = self.original_image.copy()
             cv2.rectangle(self.image, (self.start_point.x(), self.start_point.y()), 
                           (self.end_point.x(), self.end_point.y()), (255, 0, 0), 2)
-            self.original_image = self.image.copy()
             self.displayImage()
 
 if __name__ == "__main__":
