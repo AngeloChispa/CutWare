@@ -6,8 +6,17 @@ from contours import Contours;
 def processImage(image):
     # image = cv2.resize(image, (200, 1000))
     image = cv2.bilateralFilter(image, 30, 75, 75)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    image = cv2.adaptiveThreshold(
+        gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+        cv2.THRESH_BINARY_INV,1055, 9
+    )
+
     image = cv2.medianBlur(image, 9)
     image = cv2.medianBlur(image, 9)
+    image = cv2.medianBlur(image, 9)
+    
     #image = cv2.blur(image, (5, 5))
     return image
 
@@ -43,18 +52,22 @@ def maxContour(list):
         if np.array_equal(max_contour, i.getContour()):
             return i;  
 
+def drawSquare(contour, image):
+    x, y, w, h = cv2.boundingRect(contour)
+    cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
 def tests(max):
     epsilon = 0.02 * cv2.arcLength(max.getContour(), True);
     approx = cv2.approxPolyDP(max.getContour(), epsilon, True);
     return approx;
 
 
-image = cv2.imread("don.jpg");
+image = cv2.imread("mapa.png");
 height, width = image.shape[:2]
 if(height>width):
     image = cv2.resize(image, (500,1000))
 else:
-    image = cv2.resize(image, (2000,1000))
+    image = cv2.resize(image, (width*2,height*2))
 
 height, width = image.shape[:2]
 drawLines(image,height,width)
@@ -78,6 +91,7 @@ sons = max.getSons(); """
 #print(list[938].getHierarchy())   
 #image = cv2.drawContours(image,[list[610].getContour()],-1,(255,0,0),2);
 image = cv2.drawContours(image,[max.getContour()],-1,(0,0,255),2);
+drawSquare(max.getContour(),image)
 
 cv2.imshow("Imagen", image);
 cv2.imshow("Contornos", edged);
