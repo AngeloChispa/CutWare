@@ -1,18 +1,20 @@
 import sys
 import cv2
-import numpy as np
 from PyQt6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
 from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtCore import Qt, QPoint
 
+from engine import resizeImage
+
+
 class ImageEditor(QWidget):
-    def __init__(self):
+    def __init__(self, path):
         super().__init__()
+        self.path = path
         self.initUI()
     
     def initUI(self):
         self.setWindowTitle("Dibujar Cuadrado")
-        self.setGeometry(100, 100, 800, 600)
 
         self.label = QLabel(self)
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -30,19 +32,12 @@ class ImageEditor(QWidget):
         self.setLayout(layout)
     
     def openImage(self):
-        self.image = cv2.imread("meme.jpg")
+        self.image = cv2.imread(self.path)
+        self.image = cv2.resize(self.image, (550, 650))
         self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
         self.original_image = self.image.copy()
-        self.resizeWindowToImage()
         self.displayImage()
-    
-    def resizeWindowToImage(self):
-        if self.image is not None:
-            height, width, _ = self.image.shape
-            max_width, max_height = 1080, 1200
-            new_width = min(width + 20, max_width)
-            new_height = min(height + 80, max_height)
-            self.resize(new_width, new_height)
+
     
     def displayImage(self):
         if self.image is not None:

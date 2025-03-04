@@ -2,9 +2,8 @@ import sys
 from PyQt6 import QtWidgets, QtGui
 from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import QHBoxLayout, QMessageBox
-from PyQt6.uic.properties import QtCore
-
 from engine import *
+from test import *
 
 class MiEtiqueta(QtWidgets.QLabel):
     def __init__(self):
@@ -176,6 +175,12 @@ class Window(QtWidgets.QWidget):
             print("Si le gustó siiiiiiiiiii")
         else:
             print("Pues que lo recorte el por quisquilloso")
+            self.nuevaVentana(self._path)
+
+
+    def nuevaVentana(self, path):
+        self.ventana = ImageEditor(path)
+        self.ventana.show()
 
     def ActualizarPixMap(self):
         display_width = self.viewer.width()
