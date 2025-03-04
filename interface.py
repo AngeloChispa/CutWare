@@ -2,6 +2,8 @@ import sys
 from PyQt6 import QtWidgets, QtGui
 from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import QHBoxLayout, QMessageBox
+from PyQt6.uic.properties import QtCore
+
 from main import *
 
 class MiEtiqueta(QtWidgets.QLabel):
@@ -107,6 +109,35 @@ class Window(QtWidgets.QWidget):
         else:
             print("El path no es valido, vuelva a intentar con otro") #añadir una advertencia que el path no vale verga
 
+    #Alerta con la imagen para ver si es la que quiere el usuario
+    def show_alert_with_image(self, image):
+        msgBox = QtWidgets.QMessageBox(self)
+        msgBox.setWindowTitle("Crop Image")
+        msgBox.setText("¿Te parece bien este recorte? Sino puedes hacer tu propio recorte")
+        msgBox.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+
+        height, width, channel = image.shape
+        q_img = QtGui.QImage(
+            cv2.cvtColor(image, cv2.COLOR_BGR2RGB),
+            width,
+            height,
+            width * 3,
+            QtGui.QImage.Format.Format_RGB888
+        )
+
+        pixmap = QtGui.QPixmap.fromImage(q_img)
+
+        if width > height:
+            msgBox.setIconPixmap(pixmap.scaled(400, 200))
+        else:
+            msgBox.setIconPixmap(pixmap.scaled(200, 400))
+        respuesta = msgBox.exec()
+
+        if respuesta == QMessageBox.StandardButton.Yes:
+            return True
+        else:
+            return False
+
     def detectImage(self):
         if self.OpenCV_image is None:
             QMessageBox.warning(self, "Error", "Aún no has cargado una imagen")
@@ -138,6 +169,12 @@ class Window(QtWidgets.QWidget):
         self.OpenCV_image2 = image
 
         self.ActualizarPixMap2(self.OpenCV_image2)
+        crop = self.show_alert_with_image(self.OpenCV_image.copy())
+
+        if crop:
+            print("Si le gustó siiiiiiiiiii")
+        else:
+            print("Pues que lo recorte el por quisquilloso")
 
     def ActualizarPixMap(self):
         display_width = self.viewer.width()
