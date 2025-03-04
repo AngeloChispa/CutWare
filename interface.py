@@ -2,7 +2,7 @@ import sys
 from PyQt6 import QtWidgets, QtGui
 from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import QHBoxLayout, QMessageBox
-from main import *
+from engine import *
 
 class MiEtiqueta(QtWidgets.QLabel):
     def __init__(self):
@@ -116,10 +116,10 @@ class Window(QtWidgets.QWidget):
         image = self.OpenCV_image.copy()
 
         height, width = image.shape[:2]
-        if height > width:
-            image = cv2.resize(image, (500, 1000))
+        if(height>width):
+            image = cv2.resize(image, (500,1000))
         else:
-            image = cv2.resize(image, (2000, 1000))
+            image = cv2.resize(image, (width*2,height*2))
 
         height, width = image.shape[:2]
         drawLines(image, height, width)
