@@ -177,10 +177,15 @@ class Window(QtWidgets.QWidget):
             print("Pues que lo recorte el por quisquilloso")
             self.nuevaVentana(self._path)
 
-
     def nuevaVentana(self, path):
         self.ventana = ImageEditor(path)
         self.ventana.show()
+        while self.ventana.isVisible():  # Espera hasta que la ventana de `ImageEditor` se cierre
+            QApplication.processEvents()
+
+        # Obtener la imagen recortada
+        cropped_image = self.ventana.getCroppedImage()
+        self.ActualizarPixMap2(cropped_image)
 
     def ActualizarPixMap(self):
         display_width = self.viewer.width()
