@@ -90,7 +90,7 @@ class ImageEditor(QWidget):
         if width > height:
             msgBox.setIconPixmap(pixmap.scaled(400, 200))
         else:
-            msgBox.setIconPixmap(pixmap.scaled(200, 400))
+            msgBox.setIconPixmap(pixmap.scaled(800, 400))
         respuesta = msgBox.exec()
 
         if respuesta == QMessageBox.StandardButton.Yes:
@@ -111,6 +111,7 @@ class ImageEditor(QWidget):
             crop = self.show_alert_with_image(showImage)
 
             if crop:
+                return self.image
                 self.close()
 
 

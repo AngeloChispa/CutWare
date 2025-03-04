@@ -2,6 +2,7 @@ import sys
 from PyQt6 import QtWidgets, QtGui
 from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import QHBoxLayout, QMessageBox
+
 from engine import *
 from test import *
 
@@ -176,6 +177,9 @@ class Window(QtWidgets.QWidget):
         else:
             print("Pues que lo recorte el por quisquilloso")
             self.nuevaVentana(self._path)
+
+
+
 
     def nuevaVentana(self, path):
         self.ventana = ImageEditor(path)
