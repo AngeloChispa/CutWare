@@ -61,6 +61,8 @@ def tests(max):
     approx = cv2.approxPolyDP(max.getContour(), epsilon, True);
     return approx;
 
+'''
+image = cv2.imread("don.jpg");
 
 image = cv2.imread("mapa.png");
 height, width = image.shape[:2]
@@ -98,3 +100,4 @@ cv2.imshow("Contornos", edged);
 
 cv2.waitKey(0);
 cv2.destroyAllWindows();
+'''
