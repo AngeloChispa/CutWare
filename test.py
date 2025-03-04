@@ -4,7 +4,6 @@ from PyQt6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget, QMessage
 from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtCore import Qt, QPoint
 
-
 class ImageEditor(QWidget):
     def __init__(self, path):
         super().__init__()
@@ -70,10 +69,37 @@ class ImageEditor(QWidget):
             cv2.rectangle(self.image, (self.start_point.x(), self.start_point.y()), 
                           (self.end_point.x(), self.end_point.y()), (255, 0, 0), 2)
             self.displayImage()
+
+    def show_alert_with_image(self, image):
+        msgBox = QMessageBox();
+        msgBox.setWindowTitle("Crop Image")
+        msgBox.setText("¿Te parece bien este recorte? Sino puedes hacer tu propio recorte")
+        msgBox.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+
+        height, width, channel = image.shape
+        q_img = QImage(
+            cv2.cvtColor(image, cv2.COLOR_BGR2RGB),
+            width,
+            height,
+            width * 3,
+            QImage.Format.Format_RGB888
+        )
+
+        pixmap = QPixmap.fromImage(q_img)
+
+        if width > height:
+            msgBox.setIconPixmap(pixmap.scaled(400, 200))
+        else:
+            msgBox.setIconPixmap(pixmap.scaled(200, 400))
+        respuesta = msgBox.exec()
+
+        if respuesta == QMessageBox.StandardButton.Yes:
+            return True
+        else:
+            return False
     
     def mouseReleaseEvent(self, event):
         if self.drawing and self.image is not None:
-            print("HOLA MUNDO")
             self.drawing = False
             self.end_point = self.label.mapFromGlobal(event.globalPosition().toPoint()) - self.offset
             print(self.end_point)
@@ -81,6 +107,12 @@ class ImageEditor(QWidget):
             cv2.rectangle(self.image, (self.start_point.x(), self.start_point.y()),
                           (self.end_point.x(), self.end_point.y()), (255, 0, 0), 2)
             self.displayImage()
+            showImage = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
+            crop = self.show_alert_with_image(showImage)
+
+            if crop:
+                self.close()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
